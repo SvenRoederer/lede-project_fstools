@@ -686,6 +686,7 @@ static void check_filesystem(struct probe_info *pr)
 {
 	pid_t pid;
 	struct stat statbuf;
+	const char *f2fsck = "/usr/sbin/fsck.f2fs";
 	const char *e2fsck = "/usr/sbin/e2fsck";
 	const char *dosfsck = "/usr/sbin/dosfsck";
 	const char *ckfs;
@@ -696,6 +697,8 @@ static void check_filesystem(struct probe_info *pr)
 
 	if (!strncmp(pr->type, "vfat", 4)) {
 		ckfs = dosfsck;
+	} else if (!strncmp(pr->id->name, "f2fs", 4)) {
+		ckfs = f2fsck;
 	} else if (!strncmp(pr->type, "ext", 3)) {
 		ckfs = e2fsck;
 	} else {
@@ -1154,8 +1157,9 @@ static int mount_extroot(char *cfg)
 	}
 	if (pr) {
 		if (strncmp(pr->type, "ext", 3) &&
+		    strncmp(pr->id->name, "f2fs", 4) &&
 		    strncmp(pr->type, "ubifs", 5)) {
-			ULOG_ERR("extroot: unsupported filesystem %s, try ext4\n", pr->type);
+			ULOG_ERR("extroot: unsupported filesystem %s, try ext4, f2fa or ubifs\n", pr->type);
 			return -1;
 		}
 
